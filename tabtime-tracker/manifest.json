@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "Tab Time Tracker",
+  "version": "1.0.0",
+  "description": "Track how long you spend on each website and set time limits.",
+  "permissions": [
+    "tabs",
+    "storage",
+    "alarms",
+    "notifications"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "128": "icons/icon128.png"
+  }
+}

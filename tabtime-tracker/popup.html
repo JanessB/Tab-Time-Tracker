@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tab Time Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+     --bg: #1a0f0a;
+     --surface: #261510;
+     --surface2: #321c14;
+     --border: #4a2a1f;
+     --accent: #ff7043;
+     --green: #ff8a65;
+     --yellow: #ffb74d;
+     --red: #ff5252;
+     --text: #fff3ee;
+     --muted: #c4856a;
+}
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 380px;
+      min-height: 480px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+    }
+
+    /* Header */
+    .header {
+      padding: 14px 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-title {
+      font-size: 15px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-date {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    /* Tabs nav */
+    .nav-tabs {
+      display: flex;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .nav-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    /* Views */
+    .view { display: none; padding: 14px 16px; }
+    .view.active { display: block; }
+
+    /* Screen time list */
+    .section-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .site-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 6px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Progress bar behind the row */
+    .site-row-bg {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      background: rgba(124, 111, 255, 0.07);
+      transition: width 0.4s ease;
+      border-radius: 8px;
+    }
+
+    .site-favicon {
+      width: 18px; height: 18px;
+      border-radius: 4px;
+      background: var(--surface2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .site-name {
+      flex: 1;
+      font-size: 13px;
+      position: relative;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .site-time {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      color: var(--accent);
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .site-limit-badge {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'IBM Plex Mono', monospace;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .badge-ok { background: rgba(52,211,153,0.15); color: var(--green); }
+    .badge-warn { background: rgba(251,191,36,0.15); color: var(--yellow); }
+    .badge-over { background: rgba(248,113,113,0.15); color: var(--red); }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+    }
+
+    .empty-icon { font-size: 32px; margin-bottom: 10px; }
+    .empty-text { font-size: 12px; line-height: 1.6; }
+
+    /* Limits view */
+    .limit-form {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .form-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    input[type="text"], input[type="number"] {
+      flex: 1;
+      padding: 9px 11px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="number"] { width: 80px; flex: none; }
+
+    input:focus { border-color: var(--accent); }
+
+    .btn {
+      padding: 9px 16px;
+      border-radius: 7px;
+      border: none;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      width: 100%;
+    }
+
+    .btn-primary:hover { opacity: 0.88; }
+
+    /* Saved limits list */
+    .limit-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 6px;
+    }
+
+    .limit-site { font-size: 13px; }
+
+    .limit-value {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      color: var(--yellow);
+    }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: color 0.2s;
+    }
+
+    .delete-btn:hover { color: var(--red); }
+
+    /* Total bar */
+    .total-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      background: var(--surface2);
+      border-radius: 8px;
+      margin-bottom: 14px;
+      border: 1px solid var(--border);
+    }
+
+    .total-label { font-size: 12px; color: var(--muted); }
+
+    .total-time {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .reset-btn {
+      font-size: 11px;
+      color: var(--muted);
+      cursor: pointer;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 3px 8px;
+      transition: all 0.2s;
+    }
+
+    .reset-btn:hover { color: var(--red); border-color: var(--red); }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-title">⏱ Tab Time Tracker</div>
+  <div class="header-date" id="today-date"></div>
+</div>
+
+<!-- Nav tabs -->
+<div class="nav-tabs">
+  <div class="nav-tab active" data-view="stats">📊 Today</div>
+  <div class="nav-tab" data-view="limits">⏰ Limits</div>
+</div>
+
+<!-- STATS VIEW -->
+<div class="view active" id="view-stats">
+
+  <div class="total-bar">
+    <span class="total-label">Total screen time today</span>
+    <span class="total-time" id="total-time">0m</span>
+    <button class="reset-btn" id="reset-btn">reset</button>
+  </div>
+
+  <div class="section-label">Sites visited</div>
+  <div id="sites-list">
+    <div class="empty-state">
+      <div class="empty-icon">👀</div>
+      <div class="empty-text">No data yet.<br>Browse some tabs and come back!</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- LIMITS VIEW -->
+<div class="view" id="view-limits">
+
+  <div class="limit-form">
+    <div class="section-label" style="margin-bottom:12px">Set a time limit</div>
+
+    <label class="form-label">Website (e.g. youtube.com)</label>
+    <div class="form-row">
+      <input type="text" id="limit-site-input" placeholder="youtube.com">
+      <input type="number" id="limit-minutes-input" placeholder="min" min="1" max="999">
+    </div>
+
+    <button class="btn btn-primary" id="add-limit-btn">+ Set Limit</button>
+  </div>
+
+  <div class="section-label">Active limits</div>
+  <div id="limits-list">
+    <div class="empty-state">
+      <div class="empty-icon">🎯</div>
+      <div class="empty-text">No limits set yet.<br>Add a site above to get started.</div>
+    </div>
+  </div>
+
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>
