@@ -8,5 +8,5 @@ A Chrome extension that tracks how long you spend on each website throughout the
 3. Enable Developer Mode (top right toggle)
 4. Click "Load unpacked" and select the project folder
 
-## Built With
-Vanilla JavaScript, Chrome Manifest V3
+---
+Built with Vanilla JavaScript and Chrome Manifest V3
